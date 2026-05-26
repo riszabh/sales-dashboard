@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An advanced, premium Sales & Revenue Analysis Dashboard featuring interactive multi-source data importing, glassmorphism UI, KPI tracking, and automated business insights.">
+    <title>Sales & Revenue Analytics Hub</title>
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Preconnect to Fonts for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">
+                    <!-- Icon placeholder, populated by Lucide in script -->
+                    <i data-lucide="trending-up" style="width: 24px; height: 24px;"></i>
+                </div>
+                <div class="brand-name">Sales</div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Select Dataset</div>
+                
+                <button id="btn-dataset-ecommerce" class="dataset-select-btn active" onclick="app.switchDataset('ecommerce')">
+                    <span class="btn-dot"></span>
+                    <i data-lucide="shopping-bag" style="width: 16px; height: 16px;"></i>
+                    TechStore E-commerce
+                </button>
+                
+                <button id="btn-dataset-saas" class="dataset-select-btn" onclick="app.switchDataset('saas')">
+                    <span class="btn-dot"></span>
+                    <i data-lucide="layers" style="width: 16px; height: 16px;"></i>
+                    SaaS Subscription Hub
+                </button>
+            </div>
+
+            <!-- Active Dataset Metadata Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="quick-meta">
+                    <div class="nav-title" style="margin-bottom: 0.5rem;">Current Dataset Info</div>
+                    <div class="quick-meta-row">
+                        <span>Source:</span>
+                        <span id="meta-source" class="quick-meta-val">Built-In Preset</span>
+                    </div>
+                    <div class="quick-meta-row">
+                        <span>Total Rows:</span>
+                        <span id="meta-total-rows" class="quick-meta-val">0</span>
+                    </div>
+                    <div class="quick-meta-row">
+                        <span>Filtered Rows:</span>
+                        <span id="meta-filtered-rows" class="quick-meta-val">0</span>
+                    </div>
+                    <div class="quick-meta-row" style="margin-top: 0.5rem; display: block; text-align: center;">
+                        <span id="meta-dataset-tag" class="table-badge blue">TechStore E-commerce</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Dashboard Workspace -->
+        <main class="main-content">
+            
+            <!-- Top Header & Uploader -->
+            <section class="header-row">
+                <div class="header-title-area">
+                    <h1 id="dashboard-title">Sales & Revenue Intelligence</h1>
+                    <p id="dashboard-subtitle">Monitor key sales trends, examine revenue cohorts, and leverage data slicers for deep analytical business insights.</p>
+                </div>
+                
+                <div class="header-controls">
+                    <!-- CSV/Excel File Importer -->
+                    <div class="upload-btn-wrapper">
+                        <button class="btn-upload">
+                            <i data-lucide="file-up" style="width: 18px; height: 18px;"></i>
+                            Import Sales Data
+                            <input type="file" id="file-uploader" accept=".csv, .xlsx, .xls" onchange="app.handleFileUpload(event)">
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filters & Interactive Slicers Panel -->
+            <section class="glass-panel slicers-bar">
+                <!-- Search Input -->
+                <div class="filter-group">
+                    <label class="filter-label" for="search-filter">Global Search</label>
+                    <div class="search-input-wrapper">
+                        <i data-lucide="search" class="search-icon-inside" style="width: 16px; height: 16px;"></i>
+                        <input type="text" id="search-filter" class="form-input" placeholder="Search products, IDs, regions..." oninput="app.applyFilters()">
+                    </div>
+                </div>
+
+                <!-- Category Slicer -->
+                <div class="filter-group">
+                    <label class="filter-label" for="category-filter">Category / Tier</label>
+                    <select id="category-filter" class="form-select" onchange="app.applyFilters()">
+                        <option value="ALL">All Categories</option>
+                    </select>
+                </div>
+
+                <!-- Region Slicer -->
+                <div class="filter-group">
+                    <label class="filter-label" for="region-filter">Region</label>
+                    <select id="region-filter" class="form-select" onchange="app.applyFilters()">
+                        <option value="ALL">All Regions</option>
+                    </select>
+                </div>
+
+                <!-- Date Range Slider -->
+                <div class="filter-group date-slider-container">
+                    <div class="date-range-labels">
+                        <span>Date Range Slider</span>
+                        <span id="date-slider-display">Jan 2025 - Dec 2025</span>
+                    </div>
+                    <input type="range" id="date-range-slider" class="date-slider-input" min="0" max="100" value="0" oninput="app.handleDateSliderChange()">
+                </div>
+            </section>
+
+            <!-- KPI Row (Cards with sparklines) -->
+            <section class="kpi-row">
+                <!-- Revenue KPI Card -->
+                <div class="kpi-card" style="--card-glow: var(--accent-indigo); --card-glow-glow: var(--accent-indigo-glow);">
+                    <div class="kpi-header">
+                        <span class="kpi-title" id="kpi-1-title">Total Revenue</span>
+                        <div class="kpi-icon-box">
+                            <i data-lucide="dollar-sign" style="width: 20px; height: 20px;"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="kpi-revenue-val">$0.00</div>
+                    <div class="kpi-meta">
+                        <span class="kpi-badge up" id="kpi-revenue-badge">
+                            <i data-lucide="trending-up" style="width: 12px; height: 12px;"></i>
+                            <span id="kpi-revenue-badge-txt">0%</span>
+                        </span>
+                        <span>vs previous period</span>
+                    </div>
+                    <!-- Microsparkline -->
+                    <div class="kpi-sparkline-box">
+                        <canvas id="sparkline-revenue"></canvas>
+                    </div>
+                </div>
+
+                <!-- Sales Volume / Subscriber KPI Card -->
+                <div class="kpi-card" style="--card-glow: var(--accent-violet); --card-glow-glow: var(--accent-violet-glow);">
+                    <div class="kpi-header">
+                        <span class="kpi-title" id="kpi-2-title">Volume Sold</span>
+                        <div class="kpi-icon-box">
+                            <i data-lucide="shopping-cart" style="width: 20px; height: 20px;"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="kpi-volume-val">0</div>
+                    <div class="kpi-meta">
+                        <span class="kpi-badge up" id="kpi-volume-badge">
+                            <i data-lucide="trending-up" style="width: 12px; height: 12px;"></i>
+                            <span id="kpi-volume-badge-txt">0%</span>
+                        </span>
+                        <span>vs previous period</span>
+                    </div>
+                    <!-- Microsparkline -->
+                    <div class="kpi-sparkline-box">
+                        <canvas id="sparkline-volume"></canvas>
+                    </div>
+                </div>
+
+                <!-- AOV / ARPU KPI Card -->
+                <div class="kpi-card" style="--card-glow: var(--accent-emerald); --card-glow-glow: var(--accent-emerald-glow);">
+                    <div class="kpi-header">
+                        <span class="kpi-title" id="kpi-3-title">Avg Order Value</span>
+                        <div class="kpi-icon-box">
+                            <i data-lucide="credit-card" style="width: 20px; height: 20px;"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="kpi-aov-val">$0.00</div>
+                    <div class="kpi-meta">
+                        <span class="kpi-badge down" id="kpi-aov-badge">
+                            <i data-lucide="trending-down" style="width: 12px; height: 12px;"></i>
+                            <span id="kpi-aov-badge-txt">0%</span>
+                        </span>
+                        <span>vs previous period</span>
+                    </div>
+                    <!-- Microsparkline -->
+                    <div class="kpi-sparkline-box">
+                        <canvas id="sparkline-aov"></canvas>
+                    </div>
+                </div>
+
+                <!-- Margin / Churn KPI Card -->
+                <div class="kpi-card" style="--card-glow: var(--accent-amber); --card-glow-glow: var(--accent-amber-glow);">
+                    <div class="kpi-header">
+                        <span class="kpi-title" id="kpi-4-title">Gross Profit</span>
+                        <div class="kpi-icon-box">
+                            <i data-lucide="pie-chart" style="width: 20px; height: 20px;"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="kpi-profit-val">$0.00</div>
+                    <div class="kpi-meta">
+                        <span class="kpi-badge up" id="kpi-profit-badge">
+                            <i data-lucide="trending-up" style="width: 12px; height: 12px;"></i>
+                            <span id="kpi-profit-badge-txt">0%</span>
+                        </span>
+                        <span>vs previous period</span>
+                    </div>
+                    <!-- Microsparkline -->
+                    <div class="kpi-sparkline-box">
+                        <canvas id="sparkline-profit"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Analysis Grid -->
+            <section class="charts-grid">
+                <!-- Trend Over Time Chart (Double Column Width) -->
+                <div class="glass-panel chart-card double-col">
+                    <div class="chart-card-header">
+                        <h3 id="trend-chart-title">Revenue & Sales Trends</h3>
+                        <div class="chart-granularity-selector">
+                            <button id="granularity-daily" class="granularity-btn" onclick="app.setGranularity('daily')">Daily</button>
+                            <button id="granularity-weekly" class="granularity-btn" onclick="app.setGranularity('weekly')">Weekly</button>
+                            <button id="granularity-monthly" class="granularity-btn active" onclick="app.setGranularity('monthly')">Monthly</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-sales-trend"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Performing Products / Subscriptions -->
+                <div class="glass-panel chart-card">
+                    <div class="chart-card-header">
+                        <h3 id="product-chart-title">Top Performing Items</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-top-products"></canvas>
+                    </div>
+                </div>
+
+                <!-- Category Breakdown Pie -->
+                <div class="glass-panel chart-card">
+                    <div class="chart-card-header">
+                        <h3 id="category-chart-title">Sales Distribution by Category</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-category-breakdown"></canvas>
+                    </div>
+                </div>
+
+                <!-- Regional performance bar/radar -->
+                <div class="glass-panel chart-card">
+                    <div class="chart-card-header">
+                        <h3 id="regional-chart-title">Regional Revenue Contributions</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-regional-split"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dynamic Business Insights Panel -->
+            <section class="glass-panel insights-panel">
+                <div class="insights-header">
+                    <div class="brand-icon" style="width: 32px; height: 32px; box-shadow: none;">
+                        <i data-lucide="sparkles" style="width: 18px; height: 18px;"></i>
+                    </div>
+                    <h3>Automated Business Insights & Predictions</h3>
+                </div>
+                <ul id="insights-list-container" class="insights-list">
+                    <!-- Populated by JavaScript insights engine -->
+                </ul>
+            </section>
+
+            <!-- Raw Data Grid Explorer -->
+            <section class="glass-panel table-panel">
+                <div class="table-header-row">
+                    <div class="chart-card-header">
+                        <h3>Detailed Transaction Explorer</h3>
+                    </div>
+                    
+                    <div class="table-actions">
+                        <button class="btn-secondary" onclick="app.exportFilteredData()">
+                            <i data-lucide="download" style="width: 15px; height: 15px;"></i>
+                            Export to CSV
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="data-table" id="transaction-table">
+                        <thead>
+                            <tr id="table-header-row-target">
+                                <!-- Populated dynamically by script based on loaded dataset -->
+                            </tr>
+                        </thead>
+                        <tbody id="table-body-target">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination row -->
+                <div class="pagination-container">
+                    <span class="pagination-info" id="pagination-display">Showing 0-0 of 0 transactions</span>
+                    
+                    <div class="pagination-controls">
+                        <button id="btn-pagination-prev" class="btn-secondary" onclick="app.changePage(-1)" disabled>
+                            <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
+                            Previous
+                        </button>
+                        <button id="btn-pagination-next" class="btn-secondary" onclick="app.changePage(1)" disabled>
+                            Next
+                            <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Column Custom Schema Mapping Dialog (Modal) -->
+    <div class="modal-overlay" id="mapping-modal">
+        <div class="glass-panel modal-card">
+            <div class="modal-header">
+                <h2>Map Uploaded Columns</h2>
+                <p>We detected column names that don't match our standard format. Please link the properties below to the columns in your uploaded file.</p>
+            </div>
+            
+            <div class="modal-mapping-list" id="modal-mapping-list-target">
+                <!-- Programmatically populated with mapping inputs -->
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="app.closeMappingModal()">Cancel</button>
+                <button class="btn-upload" style="box-shadow: none;" onclick="app.executeMappedImport()">Apply Data Import</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load CDN Libraries (SheetJS, Chart.js, Lucide Icons, Canvas-Confetti) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Load Preset Data & Core Script -->
+    <script src="sample-data.js"></script>
+    <script src="app.js"></script>
+    
+</body>
+</html>
